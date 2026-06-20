@@ -39,7 +39,7 @@
         .anim-fade-in { animation: fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Custom active state styles for premium selection */
+        /* Custom active state styles for selection cards */
         .premium-selected {
             border-color: #15803d !important;
             background-color: #f0fdf4 !important;
@@ -81,11 +81,12 @@
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs bg-amber-500/25 border border-amber-400/30 text-amber-300 font-extrabold px-2 py-0.5 rounded-md uppercase tracking-widest">Premium POS</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="text-xs text-emerald-200 font-extrabold uppercase tracking-widest">ระบบซิงค์ในเครื่อง (Multi-Tab Sync)</span>
                 </div>
                 <h1 class="text-2xl font-black tracking-wide mt-0.5">ผัดไทยคุณปุ้ม</h1>
                 <p class="text-[11px] text-emerald-200/80 font-medium flex items-center gap-1 mt-0.5" id="sync-status-text">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> กำลังดึงข้อมูล...
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ระบบออฟไลน์สมบูรณ์ บันทึกในบราวเซอร์นี้ปลอดภัย
                 </p>
             </div>
         </div>
@@ -109,9 +110,12 @@
     </div>
 </header>
 
-<!-- ===== SYSTEM STATUS MESSAGE ===== -->
-<div id="status-bar" class="hidden max-w-7xl mx-auto px-4 mt-4">
-    <div id="status-bar-inner" class="flex items-center gap-3 text-xs px-4 py-3 rounded-2xl border font-bold transition-all shadow-sm"></div>
+<!-- ===== SYSTEM STATUS MESSAGE (LOCAL WORKSPACEPLACE) ===== -->
+<div id="status-bar" class="max-w-7xl mx-auto px-4 mt-4">
+    <div id="status-bar-inner" class="flex items-center gap-3 text-xs px-4 py-3 rounded-2xl border font-bold transition-all shadow-sm bg-emerald-50 border-emerald-200 text-emerald-800">
+        <i data-lucide="shield-check" class="w-4.5 h-4.5 flex-shrink-0 text-emerald-600"></i>
+        <span>ระบบเก็บข้อมูลออฟไลน์เรียบร้อยแล้ว หากเปิดหลายหน้าจอในเครื่องเดียวกัน ข้อมูลออเดอร์และสถานะครัวจะซิงค์กันโดยอัตโนมัติทันที</span>
+    </div>
 </div>
 
 <main class="max-w-7xl mx-auto px-4 mt-6">
@@ -128,7 +132,7 @@
                 </div>
                 <div>
                     <h2 class="font-extrabold text-slate-800 text-base">บันทึกคำสั่งซื้อใหม่</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">เลือกเส้น เมนู เครื่องปรุง และส่งเข้าครัวได้ทันที</p>
+                    <p class="text-xs text-slate-400 mt-0.5">เลือกเส้น เมนู เครื่องปรุง และสร้างคิวเข้าครัวได้ทันที</p>
                 </div>
             </div>
             <button onclick="resetOrderForm()" class="text-xs text-slate-500 hover:text-rose-600 font-bold transition-colors flex items-center gap-1">
@@ -217,8 +221,8 @@
                     <i data-lucide="history" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h2 class="font-extrabold text-slate-800 text-base">ออเดอร์วันวันนี้</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">แสดง 20 รายการล่าสุดของวันนี้</p>
+                    <h2 class="font-extrabold text-slate-800 text-base">ออเดอร์ของวันนี้</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">คิวผัดไทยประจำวันทั้งหมด</p>
                 </div>
             </div>
             <span id="today-order-count" class="bg-emerald-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-sm">0</span>
@@ -250,11 +254,8 @@
                 </div>
                 กระดานคำสั่งครัวหลังร้าน
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">รายการอาหารจะเชื่อมโยงกับฝ่ายบริการและครัวอัตโนมัติ (อัปเดตทุก 8 วินาที)</p>
+            <p class="text-xs text-slate-400 mt-0.5">รายการอาหารจะรันคิวและแสดงสถานะให้ร่วมมือกันเรียลไทม์</p>
         </div>
-        <button onclick="fetchOrders(false)" class="flex items-center gap-2 text-xs bg-white border border-slate-200 hover:border-emerald-300 text-emerald-800 font-bold px-4 py-2.5 rounded-xl hover:bg-emerald-50/50 transition-all active:scale-95 shadow-sm">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="kitchen-refresh-icon"></i> รีเฟรชหน้าครัว
-        </button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -367,39 +368,6 @@
 <!-- ===== TAB: SETTINGS (การตั้งค่า) ===== -->
 <section id="tab-settings" class="tab-content hidden max-w-3xl mx-auto space-y-6 anim-fade-in">
 
-    <!-- GAS Server URL Config -->
-    <div class="bg-white rounded-3xl border border-emerald-100 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 bg-gradient-to-r from-emerald-50 to-white border-b border-emerald-100/50 flex items-center gap-3">
-            <div class="bg-emerald-600/10 p-2 rounded-xl text-emerald-800">
-                <i data-lucide="cloud-lightning" class="w-5 h-5"></i>
-            </div>
-            <div>
-                <h2 class="font-extrabold text-slate-800 text-base">การเชื่อมต่อ Google Sheets Web App</h2>
-                <p class="text-xs text-slate-400">ผูก POS กับ Google App Script เพื่อความปลอดภัยของข้อมูล</p>
-            </div>
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3 text-xs text-amber-800">
-                <i data-lucide="info" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
-                <div class="leading-relaxed font-semibold">
-                    กรุณานำ <span class="underline">Web App URL</span> จาก Apps Script ในคู่มือสร้างชีต มากรอกด้านล่างเพื่อทำการเชื่อมโยงข้อมูลข้ามหน้าจอ (ครัว และ หน้าร้าน) และบันทึกลง Google Sheets ของคุณแบบเรียลไทม์
-                </div>
-            </div>
-            <div class="space-y-1.5">
-                <label class="text-xs font-extrabold text-slate-500 uppercase">Google Web App Exec URL</label>
-                <input type="url" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border-2 border-slate-200/80 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:border-emerald-500 transition-all font-medium bg-slate-50/50 hover:border-emerald-300">
-            </div>
-            <div class="flex gap-3">
-                <button onclick="saveSettings()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3 px-5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md">
-                    <i data-lucide="save" class="w-4 h-4"></i> บันทึกเชื่อมต่อคลาวด์
-                </button>
-                <button onclick="testConnection()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-extrabold py-3 px-5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition-all">
-                    <i data-lucide="activity" class="w-4 h-4"></i> ทดสอบดึงข้อมูล
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Menus Management Panel -->
     <div class="bg-white rounded-3xl border border-emerald-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 bg-gradient-to-r from-emerald-50 to-white border-b border-emerald-100/50 flex items-center justify-between">
@@ -425,12 +393,12 @@
     <div class="bg-rose-50/20 rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 bg-gradient-to-r from-rose-100/10 to-transparent border-b border-rose-100/30 flex items-center gap-2.5">
             <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
-            <h2 class="font-bold text-rose-800 text-sm">ส่วนงานจัดการระบบขัดข้อง (Danger Zone)</h2>
+            <h2 class="font-bold text-rose-800 text-sm">ส่วนงานจัดการระบบ (Danger Zone)</h2>
         </div>
         <div class="p-6">
-            <p class="text-xs text-slate-500 leading-relaxed mb-4">ในกรณีที่ต้องการเคลียร์หน่วยความจำออฟไลน์ของเครื่องนี้ใหม่ทั้งหมด (ไม่มีผลกระทบต่อประวัติที่บันทึกขึ้นระบบ Google Sheets คลาวด์ไปแล้ว)</p>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">ในกรณีที่ต้องการเคลียร์ออเดอร์และเมนูทั้งหมดที่จดจำไว้ในเครื่องนี้ใหม่เพื่อเริ่มต้นการขายใหม่ (ประวัติออเดอร์ทั้งหมดจะหายไป)</p>
             <button onclick="confirmResetData()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold py-3 px-5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition-all">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> ล้างประวัติคำสั่งซื้อออฟไลน์ในเครื่องนี้
+                <i data-lucide="trash-2" class="w-4 h-4"></i> ล้างประวัติคำสั่งซื้อทั้งหมดในเครื่องนี้
             </button>
         </div>
     </div>
@@ -489,25 +457,25 @@
 <!-- ===== SCRIPTS & POS CORE LOGIC ===== -->
 <script>
 // =====================================================================
-//  CONFIGURATION & REACTIVE STATE
+//  CONFIGURATION & LOCAL REACTIVE STATE
 // =====================================================================
 const DEFAULT_MENUS = [
     { id: 'm1', name: 'กุ้ง ธรรมดา',               price: 50 },
-    { id: 'm2', name: 'กุ้ง พิเศษ',                price: 60 },
-    { id: 'm3', name: 'หมึก ธรรมดา',               price: 50 },
-    { id: 'm4', name: 'หมึก พิเศษ',                price: 60 },
-    { id: 'm5', name: 'ทะเล (กุ้ง+หมึก)',          price: 60 },
-    { id: 'm6', name: 'พิเศษทะเล',               price: 70 },
-    { id: 'm7', name: 'Super พิเศษกุ้ง',           price: 70 },
-    { id: 'm8', name: 'ไม่ใส่กุ้ง/หมึก',             price: 40 },
+    { id: 'm2', name: 'กุ้ง พิเศษ',                price: 60 },	
+    { id: 'm3', name: 'Super พิเศษกุ้ง',           price: 70 },
+    { id: 'm4', name: 'หมึก ธรรมดา',             price: 50 },
+    { id: 'm5', name: 'หมึก พิเศษ',              price: 60 },
+    { id: 'm6', name: 'Super พิเศษหมึก',         price: 70 },
+    { id: 'm7', name: 'ทะเล (กุ้ง+หมึก) ธรรมดา',    price: 60 },
+    { id: 'm8', name: 'พิเศษทะเล',               price: 70 },
+    { id: 'm9', name: 'ไม่ใส่กุ้ง/หมึก ธรรมดา',       price: 40 },
+    { id: 'm10', name: 'ไม่ใส่กุ้ง/หมึก พิเศษ',       price: 50 },
 ];
 const NOODLES     = ['เส้นเล็ก', 'วุ้นเส้น', 'เกาเหลา'];
-const CONDIMENTS  = ['ใส่ทุกอย่าง', 'ไม่ใส่พริก', 'แยกพริก', 'แยกเครื่องทั้งหมด'];
-const POLL_INTERVAL_MS   = 8000;
+const CONDIMENTS  = ['ถั่ว น้ำตาล พริก', 'ไม่ใส่พริก', 'แยกพริก', 'แยกเครื่องทั้งหมด'];
 const DEBOUNCE_MS        = 400;
 
 let state = {
-    gasUrl:      localStorage.getItem('pum_gas_url') || '',
     orders:      JSON.parse(localStorage.getItem('pum_orders')  || '[]'),
     menus:       JSON.parse(localStorage.getItem('pum_menus')   || 'null') || DEFAULT_MENUS,
     qty:         1,
@@ -515,7 +483,6 @@ let state = {
     editingMenuId: null,
     confirmResolve: null,
     chartInstance: null,
-    pollTimer:   null,
     currentTab:  'order',
     todayFilter: 'all', // all, wait, done
     knownOrderIds: new Set(),
@@ -524,12 +491,11 @@ let state = {
 // =====================================================================
 //  INITIALIZATION
 // =====================================================================
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
 
     // กำหนดค่าเริ่มต้นของวันที่วิเคราะห์ยอดขาย (วันนี้)
     document.getElementById('dashboard-date').value = todayStr();
-    document.getElementById('settings-gas-url').value = state.gasUrl;
 
     // โหลดชิ้นส่วน UI ต่างๆ
     buildNoodleUI();
@@ -537,19 +503,40 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderMenuOptions();
     renderMenuCards();
     renderOrderList();
-    updateStatusBar();
 
-    // ดึงข้อมูลคลาวด์ทันทีถ้ามี URL แอดเดรส
-    if (state.gasUrl) {
-        await Promise.all([fetchMenusFromCloud(), fetchOrders(false)]);
-    }
+    // รู้จักประวัติ ID ออเดอร์ทั้งหมดเพื่อป้องกันการแจ้งเตือนเสียงออเดอร์เก่า
+    state.orders.forEach(o => state.knownOrderIds.add(o.orderId));
 
-    startPolling();
+    // ระบบตรวจจับความเคลื่อนไหวจาก Tab อื่นบนเครื่องเดียวกัน (Multi-Tab Real-time Sync!)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'pum_orders') {
+            const oldLength = state.orders.length;
+            state.orders = JSON.parse(e.newValue || '[]');
+            
+            // เช็คว่ามีออเดอร์ใหม่เพิ่มขึ้นจากแท็บอื่นหรือไม่เพื่อส่งเสียงเตือน
+            const currentNewOrders = state.orders.filter(o => !state.knownOrderIds.has(o.orderId));
+            if (currentNewOrders.length > 0 && oldLength > 0) {
+                playNotificationSound();
+                toast(`มีออเดอร์ใหม่ส่งมาจากหน้าบริการลูกค้า! ${currentNewOrders.length} รายการ`, 'info');
+            }
+            state.orders.forEach(o => state.knownOrderIds.add(o.orderId));
+
+            renderOrderList();
+            renderKitchenBoard();
+            if (state.currentTab === 'dashboard') loadDashboard();
+        }
+        if (e.key === 'pum_menus') {
+            state.menus = JSON.parse(e.newValue || '[]');
+            renderMenuOptions();
+            renderMenuCards();
+        }
+    });
+
     setTimeout(() => lucide.createIcons(), 200);
 });
 
 // =====================================================================
-//  DATETIME UTILITIES
+//  DATETIME & QUEUE UTILITIES
 // =====================================================================
 function todayStr() {
     const d = new Date();
@@ -561,45 +548,24 @@ function uid() {
     return `PUM-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
 }
 
+// คำนวณคิวถัดไปของวัน
+function getNextQueueNo() {
+    const today = todayStr();
+    const todayOrds = state.orders.filter(o => o.date === today);
+    if (todayOrds.length === 0) return 1;
+    // หาคิวสูงสุดของวันนี้
+    const maxQueue = todayOrds.reduce((max, o) => {
+        const qNum = parseInt(o.queueNo) || 0;
+        return qNum > max ? qNum : max;
+    }, 0);
+    return maxQueue + 1;
+}
+
 function saveOrdersLocal() {
     localStorage.setItem('pum_orders', JSON.stringify(state.orders));
 }
 function saveMenusLocal() {
     localStorage.setItem('pum_menus', JSON.stringify(state.menus));
-}
-
-// =====================================================================
-//  SYSTEM STATUS BAR LOGGER
-// =====================================================================
-function updateStatusBar(msg, type) {
-    const bar    = document.getElementById('status-bar');
-    const inner  = document.getElementById('status-bar-inner');
-    const syncEl = document.getElementById('sync-status-text');
-
-    if (!state.gasUrl) {
-        syncEl.textContent = 'ทำงานระบบออฟไลน์ (Offline)';
-        inner.className = 'flex items-center gap-3 text-xs px-4 py-3 rounded-2xl border font-bold bg-amber-50 border-amber-200 text-amber-800';
-        inner.innerHTML = `<i data-lucide="wifi-off" class="w-4.5 h-4.5 flex-shrink-0 text-amber-600"></i><span>ระบบทำงานแบบ Local (ออฟไลน์) – ตั้งค่า Google App Script เพื่อความปลอดภัยและแชร์ข้อมูลข้ามจอ</span>`;
-        bar.classList.remove('hidden');
-        lucide.createIcons();
-        return;
-    }
-
-    if (msg) {
-        const icon = type === 'error' ? 'alert-circle' : type === 'warn' ? 'alert-triangle' : 'check-circle';
-        const cls  = type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-700'
-                   : type === 'warn'  ? 'bg-amber-50 border-amber-200 text-amber-800'
-                   :                    'bg-emerald-50 border-emerald-200 text-emerald-800';
-        inner.className = `flex items-center gap-3 text-xs px-4 py-3 rounded-2xl border font-bold ${cls}`;
-        inner.innerHTML = `<i data-lucide="${icon}" class="w-4.5 h-4.5 flex-shrink-0"></i><span>${msg}</span>`;
-        bar.classList.remove('hidden');
-        lucide.createIcons();
-    } else {
-        bar.classList.add('hidden');
-    }
-
-    const now = new Date();
-    syncEl.textContent = `เชื่อมโยงข้อมูลสำเร็จแล้วเมื่อ ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} น.`;
 }
 
 // =====================================================================
@@ -626,90 +592,6 @@ function switchTab(name) {
 
 // กำหนดปุ่มรับออเดอร์ให้แอคทีฟเป็นดีฟอลต์
 document.getElementById('btn-order').classList.add('bg-white','text-emerald-900','shadow-md');
-
-// =====================================================================
-//  CLOUD ACTIONS (Fetch API)
-// =====================================================================
-async function apiFetch(params, retries = 1) {
-    if (!state.gasUrl) throw new Error('ไม่พบ URL ตั้งค่าระบบ');
-    const url = `${state.gasUrl}?${new URLSearchParams(params)}`;
-    let lastErr;
-    for (let i = 0; i <= retries; i++) {
-        try {
-            const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return await res.json();
-        } catch (e) {
-            lastErr = e;
-            if (i < retries) await new Promise(r => setTimeout(r, 800));
-        }
-    }
-    throw lastErr;
-}
-
-async function fetchOrders(showToast = true) {
-    if (!state.gasUrl) return;
-    const icon = document.getElementById('kitchen-refresh-icon');
-    if (icon) icon.classList.add('spin');
-    try {
-        const data = await apiFetch({ action: 'getOrders' });
-        if (!Array.isArray(data)) throw new Error('โครงสร้างข้อมูลไม่สมบูรณ์');
-        
-        // ค้นหาออเดอร์ใหม่เพื่อแจ้งเตือนเสียง
-        const newIds = data.filter(o => !state.knownOrderIds.has(o.orderId));
-        if (newIds.length > 0 && state.knownOrderIds.size > 0) {
-            playNotificationSound();
-            toast(`มีออเดอร์ใหม่เข้าครัว! ${newIds.length} รายการ`, 'info');
-        }
-        data.forEach(o => state.knownOrderIds.add(o.orderId));
-
-        state.orders = data.reverse(); // เอาล่าสุดขึ้นก่อน
-        saveOrdersLocal();
-        renderOrderList();
-        renderKitchenBoard();
-        if (state.currentTab === 'dashboard') loadDashboard();
-        updateStatusBar(null);
-    } catch (e) {
-        console.error('fetchOrders:', e);
-        if (showToast) toast('ล้มเหลวในการเชื่อมฐานข้อมูล: ' + e.message, 'error');
-        updateStatusBar('ระบบขัดข้อง – ตรวจสอบสัญญาอินเทอร์เน็ตหรือ Apps Script URL', 'error');
-    } finally {
-        if (icon) icon.classList.remove('spin');
-    }
-}
-
-async function fetchMenusFromCloud() {
-    try {
-        const data = await apiFetch({ action: 'getMenus' });
-        if (Array.isArray(data) && data.length > 0) {
-            state.menus = data;
-            saveMenusLocal();
-            renderMenuOptions();
-            renderMenuCards();
-        }
-    } catch (e) {
-        console.warn('เชื่อมต่อข้อมูลเมนูคลาวด์ไม่ได้ ระบบใช้ข้อมูลในเครื่องแทน:', e);
-    }
-}
-
-async function syncMenuToCloud(action, menuData) {
-    try {
-        await apiFetch({ action, ...menuData });
-    } catch (e) {
-        console.warn('ไม่สามารถบันทึกเมนูขึ้นคลาวด์ได้ทันที บันทึกในบราวเซอร์เครื่องนี้เรียบร้อย:', e);
-    }
-}
-
-// =====================================================================
-//  REALTIME AUTO-POLLING KITCHEN BOARD
-// =====================================================================
-function startPolling() {
-    if (state.pollTimer) clearInterval(state.pollTimer);
-    state.pollTimer = setInterval(() => {
-        // อัปเดตตลอดเวลาเพื่อให้ออเดอร์และตัวเลขหน้าครัวลิงค์กันเสมอ
-        fetchOrders(false);
-    }, POLL_INTERVAL_MS);
-}
 
 // =====================================================================
 //  ORDER FORM BUILDERS
@@ -820,7 +702,7 @@ async function handlePlaceOrder() {
     const btn     = document.getElementById('submit-btn');
     const btnText = document.getElementById('submit-btn-text');
     btn.disabled  = true;
-    btnText.textContent = 'กำลังส่งรายการสั่งซื้อ...';
+    btnText.textContent = 'กำลังออกคิวรับออเดอร์...';
 
     const noodle    = document.querySelector('input[name="noodle"]:checked')?.value;
     const menuRadio = document.querySelector('input[name="menu-type"]:checked');
@@ -839,38 +721,23 @@ async function handlePlaceOrder() {
     const now     = new Date();
     const dateStr = todayStr();
     const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const queueNo = getNextQueueNo();
 
     const order = {
         date: dateStr, time: timeStr, orderId,
         menu: `${noodle} · ${menuRadio.value} (${condiment})`,
         qty: state.qty, price, total,
-        status: 'รอทำ', note
+        status: 'รอทำ', note, queueNo
     };
 
-    // UI ดำเนินการล่วงหน้าทันทีเพื่อลดความหน่วง (Optimistic UI)
+    // บันทึกและซิงค์ทันที
     state.orders.unshift(order);
     state.knownOrderIds.add(orderId);
     saveOrdersLocal();
     renderOrderList();
     resetOrderForm();
 
-    if (state.gasUrl) {
-        try {
-            await apiFetch({
-                action: 'addOrder',
-                date: order.date, time: order.time, orderId: order.orderId,
-                menu: order.menu, qty: order.qty, price: order.price,
-                total: order.total, status: order.status, note: order.note
-            });
-            toast('ส่งรายการออเดอร์ขึ้น Google Sheets สำเร็จ!', 'success');
-            await fetchOrders(false);
-        } catch (e) {
-            toast('มีปัญหาการบันทึกคลาวด์ – บันทึกบนเครื่องนี้ให้เรียบร้อยแล้ว', 'warn');
-            console.error('syncOrder:', e);
-        }
-    } else {
-        toast('บันทึกคำสั่งซื้อออฟไลน์สำเร็จ!', 'success');
-    }
+    toast(`บันทึกสำเร็จ ออกรหัสคิว Q-${String(queueNo).padStart(3, '0')}`, 'success');
 
     resetSubmitBtn();
 }
@@ -928,7 +795,7 @@ function renderOrderList() {
     let todayOrds = state.orders.filter(o => o.date === dateStr);
     const container = document.getElementById('recent-orders-list');
 
-    // อัปเดตยอดนับรวม (อิงตามยอดรวมทั้งหมดของวันนั้น)
+    // อัปเดตยอดนับรวม
     document.getElementById('today-order-count').textContent = todayOrds.length;
 
     // กรองประเภทตามต้องการ
@@ -955,11 +822,14 @@ function renderOrderList() {
             ? 'bg-rose-100 text-rose-700 border border-rose-200'
             : 'bg-emerald-100 text-emerald-800 border border-emerald-200';
         
+        const qText = String(o.queueNo || 0).padStart(3, '0');
+        
         return `
         <div class="bg-white border border-slate-150 p-4 rounded-2xl flex items-start justify-between anim-fade-in hover:shadow-sm transition-all duration-150">
             <div class="space-y-1 flex-1 min-w-0">
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <span class="font-black text-xs text-slate-400">${o.orderId}</span>
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="bg-amber-500 text-slate-900 font-black text-[10px] px-2 py-0.5 rounded-lg shadow-sm">คิว Q-${qText}</span>
+                    <span class="font-black text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">${o.orderId}</span>
                     <span class="text-[11px] text-slate-400 font-bold flex items-center gap-0.5">
                         <i data-lucide="clock" class="w-3 h-3"></i> ${o.time} น.
                     </span>
@@ -970,7 +840,7 @@ function renderOrderList() {
                     ${o.note ? `<span class="text-xs text-amber-800 font-extrabold bg-amber-50 border border-amber-200/50 px-2 py-0.5 rounded-lg truncate max-w-[150px]">★ ${o.note}</span>` : ''}
                 </div>
             </div>
-            <div class="text-right ml-3 flex-shrink-0 flex flex-col items-end gap-1.5">
+            <div class="text-right ml-3 flex-shrink-0 flex flex-col items-end gap-1.5 pt-1">
                 <span class="font-black text-base text-slate-800 tracking-tight">${o.total} ฿</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full font-extrabold tracking-wider uppercase ${badgeStyle}">${o.status}</span>
             </div>
@@ -1024,10 +894,15 @@ function renderKitchenBoard() {
 
 function kitchenCard(order, isPending) {
     const bgStyle = isPending ? 'border-rose-200 cooking-alert' : 'border-slate-150';
+    const qText = String(order.queueNo || 0).padStart(3, '0');
+    
     return `
     <div class="bg-white rounded-2xl border-2 p-5 space-y-3.5 anim-fade-in hover:shadow-md transition-shadow relative ${bgStyle}">
         <div class="flex justify-between items-center">
-            <span class="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">${order.orderId}</span>
+            <div class="flex items-center gap-2">
+                <span class="bg-amber-500 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-lg shadow-sm">คิว Q-${qText}</span>
+                <span class="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">${order.orderId}</span>
+            </div>
             <span class="text-[11px] font-bold text-slate-500 flex items-center gap-0.5">
                 <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${order.time} น.
             </span>
@@ -1056,25 +931,16 @@ async function completeOrder(orderId) {
     const idx = state.orders.findIndex(o => o.orderId === orderId);
     if (idx === -1) return;
 
-    // เปลี่ยนแปลงแบบโลคัลทันทีก่อน
+    // เปลี่ยนแปลงแบบโลคัลและเซฟ
     state.orders[idx].status = 'เสร็จแล้ว';
     saveOrdersLocal();
     renderKitchenBoard();
     renderOrderList();
-
-    if (state.gasUrl) {
-        try {
-            await apiFetch({ action: 'updateStatus', orderId, status: 'เสร็จแล้ว' });
-            toast('อัปเดตสถิติตารางหลังร้านเสร็จแล้ว', 'success');
-            await fetchOrders(false);
-        } catch (e) {
-            toast('บันทึกคลาวด์ขัดข้อง แต่ปรับในบราวเซอร์เรียบร้อย', 'warn');
-        }
-    }
+    toast(`คิวผัดไทย Q-${String(state.orders[idx].queueNo).padStart(3, '0')} ปรุงเสร็จเรียบร้อย!`, 'success');
 }
 
 // =====================================================================
-//  AUDIO FEEDBACK NOTIFIER (ระบบแจ้งเตือนเสียงเวลามีออเดอร์ใหม่)
+//  AUDIO FEEDBACK NOTIFIER (ระบบแจ้งเตือนเสียงออเดอร์ใหม่)
 // =====================================================================
 function playNotificationSound() {
     try {
@@ -1094,7 +960,7 @@ function playNotificationSound() {
 }
 
 // =====================================================================
-//  DASHBOARD ANALYTICS (ฝ่ายวิเคราะห์วิจัยความสำเร็จร้าน)
+//  DASHBOARD ANALYTICS (ฝ่ายวิเคราะห์ยอดขาย)
 // =====================================================================
 function loadDashboard() {
     const date   = document.getElementById('dashboard-date').value || todayStr();
@@ -1137,7 +1003,7 @@ function renderSalesChart(stats) {
     const labels = Object.keys(stats);
     const data   = Object.values(stats);
     
-    // Modern colors palette (Emerald, Teal, Gold, Blue)
+    // Modern colors palette
     const colors = [
         '#064e3b', '#15803d', '#10b981', '#34d399', 
         '#f59e0b', '#fbbf24', '#3b82f6', '#6366f1', 
@@ -1172,34 +1038,6 @@ function renderSalesChart(stats) {
             cutout: '65%'
         }
     });
-}
-
-// =====================================================================
-//  SETTINGS & CONFIGURATION MANAGEMENT
-// =====================================================================
-async function saveSettings() {
-    const url = document.getElementById('settings-gas-url').value.trim();
-    state.gasUrl = url;
-    localStorage.setItem('pum_gas_url', url);
-    updateStatusBar(url ? 'บันทึกเรียบร้อย กำลังซิงค์ข้อมูล...' : 'ล้างการเชื่อมต่อเรียบร้อย ระบบสลับเป็นโหมดโลคอล');
-    toast('บันทึกที่อยู่เชื่อมต่อคลาวด์เรียบร้อยแล้ว', 'success');
-    if (url) {
-        await Promise.all([fetchMenusFromCloud(), fetchOrders(false)]);
-    }
-}
-
-async function testConnection() {
-    const url = document.getElementById('settings-gas-url').value.trim();
-    if (!url) { toast('กรุณากรอกข้อมูล URL ก่อนทดสอบครับ', 'error'); return; }
-    toast('กำลังสื่อสารเชื่อมต่อกับคลาวด์...', 'info');
-    try {
-        const res = await fetch(`${url}?action=getOrders`, { signal: AbortSignal.timeout(8000) });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        toast(`ทดสอบสำเร็จ! พบประวัติการบันทึกอาหาร ${Array.isArray(data)?data.length:0} ออเดอร์บนชีต`, 'success');
-    } catch (e) {
-        toast(`ไม่สามารถติดต่อระบบได้: ${e.message}`, 'error');
-    }
 }
 
 // =====================================================================
@@ -1253,18 +1091,16 @@ async function saveMenuFromModal() {
     if (state.editingMenuId) {
         const i = state.menus.findIndex(m => m.id === state.editingMenuId);
         if (i !== -1) { state.menus[i].name = name; state.menus[i].price = price; }
-        syncMenuToCloud('updateMenu', { menuId: state.editingMenuId, name, price });
     } else {
         const newMenu = { id: 'm_' + Date.now(), name, price };
         state.menus.push(newMenu);
-        syncMenuToCloud('addMenu', { menuId: newMenu.id, name, price });
     }
 
     saveMenusLocal();
     renderMenuOptions();
     renderMenuCards();
     closeMenuModal();
-    toast('บันทึกการจัดเก็บเมนูในระบบสำเร็จแล้ว', 'success');
+    toast('บันทึกรายละเอียดราคาของเมนูแล้ว', 'success');
 }
 
 async function deleteMenu(menuId) {
@@ -1273,20 +1109,19 @@ async function deleteMenu(menuId) {
     if (!ok) return;
     state.menus = state.menus.filter(m => m.id !== menuId);
     saveMenusLocal();
-    syncMenuToCloud('deleteMenu', { menuId });
     renderMenuOptions();
     renderMenuCards();
-    toast('ลบข้อมูลออกจากระบบหน้าร้านเรียบร้อย', 'info');
+    toast('ลบเมนูผัดไทยออกจากแคตตาล็อกแล้ว', 'info');
 }
 
 async function confirmResetData() {
-    const ok = await showConfirm('คุณกำลังล้างฐานข้อมูลในเครื่องนี้ ประวัติจะไม่หายในคลาวด์ คุณแน่ใจใช่หรือไม่?');
+    const ok = await showConfirm('คุณกำลังล้างข้อมูลในระบบนี้ทั้งหมดเพื่อตั้งค่าโรงงาน ประวัติคำสั่งซื้อทั้งหมดในเครื่องจะสูญหายอย่างถาวร ยืนยันหรือไม่?');
     if (!ok) return;
     state.orders = [];
     state.knownOrderIds.clear();
     localStorage.removeItem('pum_orders');
     renderOrderList();
-    toast('ล้างระบบฐานข้อมูลออฟไลน์เรียบร้อยแล้ว', 'info');
+    toast('ล้างระบบฐานข้อมูลทั้งหมดสำเร็จแล้ว', 'info');
 }
 
 // =====================================================================
@@ -1294,9 +1129,9 @@ async function confirmResetData() {
 // =====================================================================
 function exportCSV() {
     if (state.orders.length === 0) { toast('ไม่พบออเดอร์ในประวัติสำหรับการแปลงไฟล์รายงาน', 'warn'); return; }
-    let csv = '\uFEFFDate,Time,OrderID,Menu,Qty,Price,Total,Status,Note\n';
+    let csv = '\uFEFFDate,Time,OrderID,QueueNo,Menu,Qty,Price,Total,Status,Note\n';
     state.orders.forEach(o => {
-        csv += [o.date, o.time, o.orderId, `"${o.menu}"`, o.qty, o.price, o.total, `"${o.status}"`, `"${(o.note||'').replace(/"/g,'""')}"`].join(',') + '\n';
+        csv += [o.date, o.time, o.orderId, o.queueNo || '-', `"${o.menu}"`, o.qty, o.price, o.total, `"${o.status}"`, `"${(o.note||'').replace(/"/g,'""')}"`].join(',') + '\n';
     });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
@@ -1363,14 +1198,14 @@ function toast(msg, type = 'info') {
 
 // ทำความสะอาดไอคอนครั้งสุดท้ายหลังโหลดทั้งหมดเสร็จสิ้น
 setTimeout(() => lucide.createIcons(), 500);
-   // Service Worker
+
+// Service Worker Registration for Offline support (PWA)
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 
-// Install button
+// Install button setup
 let deferredPrompt;
-
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
