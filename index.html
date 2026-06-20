@@ -5,7 +5,7 @@
     <meta name="theme-color" content="#15803d">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ผัดไทยคุณปุ้ม – POS ระบบจัดการร้านอาหารยุคใหม่</title>
+    <title>ผัดไทยคุณปุ้ม – POS ระบบซิงค์ข้ามเครื่องเรียลไทม์</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -68,26 +68,32 @@
     </style>
 </head>
 <body class="bg-[#f4f7f5] min-h-screen text-slate-800 pb-12 antialiased">
-    <button id="installBtn" style="display:none;">
-    ติดตั้งแอป
-    </button>
+    <button id="installBtn" style="display:none;">ติดตั้งแอป</button>
+
 <!-- ===== MODERN TOP BAR ===== -->
 <header class="bg-gradient-to-r from-[#064e3b] via-[#0f5132] to-[#15803d] text-white shadow-xl sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
         <!-- Brand/Logo -->
-        <div class="flex items-center gap-3.5">
-            <div class="bg-gradient-to-br from-amber-400 to-amber-500 p-2.5 rounded-2xl shadow-inner text-emerald-950">
-                <i data-lucide="cooking-pot" class="w-6.5 h-6.5"></i>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span class="text-xs text-emerald-200 font-extrabold uppercase tracking-widest">ระบบซิงค์ในเครื่อง (Multi-Tab Sync)</span>
+        <div class="flex items-center gap-3.5 w-full md:w-auto justify-between md:justify-start">
+            <div class="flex items-center gap-3.5">
+                <div class="bg-gradient-to-br from-amber-400 to-amber-500 p-2.5 rounded-2xl shadow-inner text-emerald-950">
+                    <i data-lucide="cooking-pot" class="w-6.5 h-6.5"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-wide mt-0.5">ผัดไทยคุณปุ้ม</h1>
-                <p class="text-[11px] text-emerald-200/80 font-medium flex items-center gap-1 mt-0.5" id="sync-status-text">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> ระบบออฟไลน์สมบูรณ์ บันทึกในบราวเซอร์นี้ปลอดภัย
-                </p>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span class="text-[10px] text-emerald-200 font-extrabold uppercase tracking-widest" id="sync-badge">กำลังเชื่อมต่อ...</span>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-wide mt-0.5">ผัดไทยคุณปุ้ม</h1>
+                    <p class="text-[11px] text-emerald-200/80 font-medium flex items-center gap-1 mt-0.5" id="sync-status-text">
+                        กำลังตรวจสอบการเชื่อมต่อคลาวด์...
+                    </p>
+                </div>
+            </div>
+            <!-- Complete Device User ID Badge for discoverability -->
+            <div class="md:ml-4 text-right md:text-left flex flex-col gap-0.5">
+                <span class="text-[9px] text-emerald-300 font-bold uppercase tracking-wider">Device Cloud ID:</span>
+                <span id="user-id-display" class="text-[10px] bg-emerald-950/50 px-2 py-0.5 rounded-md font-mono text-emerald-200 border border-emerald-800/40 truncate max-w-[140px] md:max-w-xs">Connecting...</span>
             </div>
         </div>
 
@@ -110,11 +116,11 @@
     </div>
 </header>
 
-<!-- ===== SYSTEM STATUS MESSAGE (LOCAL WORKSPACEPLACE) ===== -->
+<!-- ===== SYSTEM STATUS MESSAGE ===== -->
 <div id="status-bar" class="max-w-7xl mx-auto px-4 mt-4">
     <div id="status-bar-inner" class="flex items-center gap-3 text-xs px-4 py-3 rounded-2xl border font-bold transition-all shadow-sm bg-emerald-50 border-emerald-200 text-emerald-800">
         <i data-lucide="shield-check" class="w-4.5 h-4.5 flex-shrink-0 text-emerald-600"></i>
-        <span>ระบบเก็บข้อมูลออฟไลน์เรียบร้อยแล้ว หากเปิดหลายหน้าจอในเครื่องเดียวกัน ข้อมูลออเดอร์และสถานะครัวจะซิงค์กันโดยอัตโนมัติทันที</span>
+        <span id="status-message">ระบบทำงานร่วมกันเรียลไทม์สำเร็จแล้ว เปิดกี่อุปกรณ์ข้อมูลก็จะอัปเดตตรงกันทันที!</span>
     </div>
 </div>
 
@@ -157,8 +163,9 @@
                     <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-[10px]">2</span> 
                     เลือกเมนูผัดไทย
                 </p>
-                <div id="menu-options-container" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div class="skeleton h-24 rounded-2xl col-span-full"></div>
+                <div id="menu-options-container" class="flex flex-col gap-2">
+                    <div class="skeleton h-14 rounded-2xl col-span-full"></div>
+                    <div class="skeleton h-14 rounded-2xl col-span-full"></div>
                 </div>
             </div>
 
@@ -194,9 +201,9 @@
             </div>
 
             <!-- Preview Card -->
-            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 text-white rounded-2xl p-5 shadow-lg flex justify-between items-center border border-emerald-700/30">
+            <div class="bg-gradient-to-br from-[#064e3b] to-emerald-950 text-white rounded-2xl p-5 shadow-lg flex justify-between items-center border border-emerald-700/30">
                 <div class="space-y-1">
-                    <p class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider">พรีวิวคำสั่งซื้อ</p>
+                    <p class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider" id="preview-title">พรีวิวคำสั่งซื้อ</p>
                     <p id="order-preview-text" class="font-extrabold text-base text-emerald-50 leading-tight">—</p>
                 </div>
                 <div class="text-right">
@@ -254,7 +261,7 @@
                 </div>
                 กระดานคำสั่งครัวหลังร้าน
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">รายการอาหารจะรันคิวและแสดงสถานะให้ร่วมมือกันเรียลไทม์</p>
+            <p class="text-xs text-slate-400 mt-0.5">รายการอาหารจะเชื่อมโยงเรียลไทม์เพื่อร่วมมือกันหลังบ้าน</p>
         </div>
     </div>
 
@@ -393,12 +400,12 @@
     <div class="bg-rose-50/20 rounded-3xl border border-rose-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 bg-gradient-to-r from-rose-100/10 to-transparent border-b border-rose-100/30 flex items-center gap-2.5">
             <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
-            <h2 class="font-bold text-rose-800 text-sm">ส่วนงานจัดการระบบ (Danger Zone)</h2>
+            <h2 class="font-bold text-rose-800 text-sm">ส่วนงานจัดการระบบขัดข้อง (Danger Zone)</h2>
         </div>
         <div class="p-6">
-            <p class="text-xs text-slate-500 leading-relaxed mb-4">ในกรณีที่ต้องการเคลียร์ออเดอร์และเมนูทั้งหมดที่จดจำไว้ในเครื่องนี้ใหม่เพื่อเริ่มต้นการขายใหม่ (ประวัติออเดอร์ทั้งหมดจะหายไป)</p>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">ในกรณีที่ต้องการเคลียร์ออเดอร์และเมนูทั้งหมดออกจากฐานข้อมูลคลาวด์เพื่อเริ่มต้นวันใหม่ (ออเดอร์ในหน้าจออื่นๆ จะว่างลงเช่นกัน)</p>
             <button onclick="confirmResetData()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold py-3 px-5 rounded-xl text-xs flex items-center gap-2 active:scale-95 transition-all">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> ล้างประวัติคำสั่งซื้อทั้งหมดในเครื่องนี้
+                <i data-lucide="trash-2" class="w-4 h-4"></i> ล้างประวัติคำสั่งซื้อทั้งหมดในคลาวด์
             </button>
         </div>
     </div>
@@ -454,11 +461,15 @@
 <!-- ===== FLOATING TOAST FEEDBACK ===== -->
 <div id="toast-container" class="fixed bottom-6 right-6 left-6 sm:left-auto z-[100] space-y-2.5 pointer-events-none"></div>
 
-<!-- ===== SCRIPTS & POS CORE LOGIC ===== -->
-<script>
-// =====================================================================
-//  CONFIGURATION & LOCAL REACTIVE STATE
-// =====================================================================
+<!-- ===== SCRIPTS & POS CORE LOGIC WITH FIRESTORE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// ---------------------------------------------------------------------
+//  CONFIGURATION & REACTIVE STATE
+// ---------------------------------------------------------------------
 const DEFAULT_MENUS = [
     { id: 'm1', name: 'กุ้ง ธรรมดา',               price: 50 },
     { id: 'm2', name: 'กุ้ง พิเศษ',                price: 60 },	
@@ -488,56 +499,146 @@ let state = {
     knownOrderIds: new Set(),
 };
 
-// =====================================================================
-//  INITIALIZATION
-// =====================================================================
-window.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
+// ---------------------------------------------------------------------
+//  FIREBASE INITIALIZATION
+// ---------------------------------------------------------------------
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'padthai-khun-pum';
+let db = null;
+let auth = null;
+let currentUser = null;
 
-    // กำหนดค่าเริ่มต้นของวันที่วิเคราะห์ยอดขาย (วันนี้)
-    document.getElementById('dashboard-date').value = todayStr();
+if (typeof __firebase_config !== 'undefined') {
+    try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+    } catch (e) {
+        console.error("Firebase config parsing error:", e);
+    }
+}
 
-    // โหลดชิ้นส่วน UI ต่างๆ
-    buildNoodleUI();
-    buildCondimentUI();
-    renderMenuOptions();
-    renderMenuCards();
+// ---------------------------------------------------------------------
+//  AUTHENTICATION (RULE 3)
+// ---------------------------------------------------------------------
+async function authenticate() {
+    if (!auth) {
+        setOfflineMode();
+        return;
+    }
+    try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            const credentials = await signInWithCustomToken(auth, __initial_auth_token);
+            currentUser = credentials.user;
+        } else {
+            const credentials = await signInAnonymously(auth);
+            currentUser = credentials.user;
+        }
+        
+        // Show complete userId for discoverability
+        document.getElementById('user-id-display').textContent = currentUser.uid;
+        
+        // Setup real-time firestore queries
+        setupFirestoreListeners();
+    } catch (err) {
+        console.error("Auth failed:", err);
+        setOfflineMode();
+    }
+}
+
+function setOfflineMode() {
+    document.getElementById('user-id-display').textContent = "LocalStorage ออฟไลน์";
+    document.getElementById('sync-badge').textContent = "ออฟไลน์ (Local)";
+    document.getElementById('sync-status-text').innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block mr-1"></span> เก็บข้อมูลเฉพาะแท็บเครื่องนี้ (ไม่มีคลาวด์)`;
+    
+    // Fallback to local storage values
     renderOrderList();
+    renderKitchenBoard();
+}
 
-    // รู้จักประวัติ ID ออเดอร์ทั้งหมดเพื่อป้องกันการแจ้งเตือนเสียงออเดอร์เก่า
-    state.orders.forEach(o => state.knownOrderIds.add(o.orderId));
+// ---------------------------------------------------------------------
+//  REAL-TIME DATABASE SYNC (RULE 1 & RULE 2)
+// ---------------------------------------------------------------------
+function setupFirestoreListeners() {
+    if (!db || !currentUser) return;
 
-    // ระบบตรวจจับความเคลื่อนไหวจาก Tab อื่นบนเครื่องเดียวกัน (Multi-Tab Real-time Sync!)
-    window.addEventListener('storage', (e) => {
-        if (e.key === 'pum_orders') {
-            const oldLength = state.orders.length;
-            state.orders = JSON.parse(e.newValue || '[]');
-            
-            // เช็คว่ามีออเดอร์ใหม่เพิ่มขึ้นจากแท็บอื่นหรือไม่เพื่อส่งเสียงเตือน
-            const currentNewOrders = state.orders.filter(o => !state.knownOrderIds.has(o.orderId));
-            if (currentNewOrders.length > 0 && oldLength > 0) {
-                playNotificationSound();
-                toast(`มีออเดอร์ใหม่ส่งมาจากหน้าบริการลูกค้า! ${currentNewOrders.length} รายการ`, 'info');
-            }
-            state.orders.forEach(o => state.knownOrderIds.add(o.orderId));
+    // RULE 1 Path for shared public orders: /artifacts/{appId}/public/data/orders
+    const ordersRef = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
+    
+    // Listen in real-time
+    onSnapshot(ordersRef, (snapshot) => {
+        const fetchedOrders = [];
+        snapshot.forEach(doc => {
+            fetchedOrders.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Sort in memory to satisfy RULE 2 (no orderBy in queries)
+        // Sort newest first by combining date and time
+        fetchedOrders.sort((a, b) => {
+            const dateTimeA = (a.date || '') + ' ' + (a.time || '');
+            const dateTimeB = (b.date || '') + ' ' + (b.time || '');
+            return dateTimeB.localeCompare(dateTimeA);
+        });
 
-            renderOrderList();
-            renderKitchenBoard();
-            if (state.currentTab === 'dashboard') loadDashboard();
+        // Alarm for new orders that this tab/device hasn't seen yet
+        const currentNewOrders = fetchedOrders.filter(o => !state.knownOrderIds.has(o.orderId));
+        if (currentNewOrders.length > 0 && state.knownOrderIds.size > 0) {
+            playNotificationSound();
+            toast(`มีออเดอร์ใหม่เข้ามา! ${currentNewOrders.length} รายการ`, 'info');
         }
-        if (e.key === 'pum_menus') {
-            state.menus = JSON.parse(e.newValue || '[]');
-            renderMenuOptions();
-            renderMenuCards();
-        }
+        
+        fetchedOrders.forEach(o => state.knownOrderIds.add(o.orderId));
+        state.orders = fetchedOrders;
+        
+        saveOrdersLocal();
+        renderOrderList();
+        renderKitchenBoard();
+        if (state.currentTab === 'dashboard') loadDashboard();
+        updateStatusBar();
+    }, (error) => {
+        console.error("Orders listener error:", error);
     });
 
-    setTimeout(() => lucide.createIcons(), 200);
-});
+    // RULE 1 Path for shared public menus: /artifacts/{appId}/public/data/menus
+    const menusRef = collection(db, 'artifacts', appId, 'public', 'data', 'menus');
+    onSnapshot(menusRef, (snapshot) => {
+        if (snapshot.empty) {
+            // Seed base menu if cloud is empty
+            DEFAULT_MENUS.forEach(async (m) => {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'menus', m.id), m);
+            });
+            return;
+        }
+        
+        const fetchedMenus = [];
+        snapshot.forEach(doc => {
+            fetchedMenus.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Sort in-memory (RULE 2)
+        fetchedMenus.sort((a, b) => a.id.localeCompare(b.id));
+        state.menus = fetchedMenus;
+        
+        saveMenusLocal();
+        renderMenuOptions();
+        renderMenuCards();
+    }, (error) => {
+        console.error("Menus listener error:", error);
+    });
+}
 
-// =====================================================================
-//  DATETIME & QUEUE UTILITIES
-// =====================================================================
+function updateStatusBar() {
+    const badge = document.getElementById('sync-badge');
+    const syncText = document.getElementById('sync-status-text');
+    badge.textContent = "คลาวด์เรียลไทม์ (Sync Online)";
+    
+    const d = new Date();
+    syncText.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block mr-1 animate-pulse"></span> เชื่อมโยงทุกเครื่องเรียบร้อยแล้วเมื่อ ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} น.`;
+}
+
+// ---------------------------------------------------------------------
+//  DATETIME & UTILITIES
+// ---------------------------------------------------------------------
 function todayStr() {
     const d = new Date();
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -553,7 +654,6 @@ function getNextQueueNo() {
     const today = todayStr();
     const todayOrds = state.orders.filter(o => o.date === today);
     if (todayOrds.length === 0) return 1;
-    // หาคิวสูงสุดของวันนี้
     const maxQueue = todayOrds.reduce((max, o) => {
         const qNum = parseInt(o.queueNo) || 0;
         return qNum > max ? qNum : max;
@@ -568,9 +668,9 @@ function saveMenusLocal() {
     localStorage.setItem('pum_menus', JSON.stringify(state.menus));
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  TAB CHANGER
-// =====================================================================
+// ---------------------------------------------------------------------
 function switchTab(name) {
     state.currentTab = name;
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -590,12 +690,9 @@ function switchTab(name) {
     lucide.createIcons();
 }
 
-// กำหนดปุ่มรับออเดอร์ให้แอคทีฟเป็นดีฟอลต์
-document.getElementById('btn-order').classList.add('bg-white','text-emerald-900','shadow-md');
-
-// =====================================================================
+// ---------------------------------------------------------------------
 //  ORDER FORM BUILDERS
-// =====================================================================
+// ---------------------------------------------------------------------
 function buildNoodleUI() {
     const c = document.getElementById('noodle-container');
     c.innerHTML = NOODLES.map((n, i) => `
@@ -645,10 +742,12 @@ function buildCondimentUI() {
 function renderMenuOptions() {
     const c = document.getElementById('menu-options-container');
     c.innerHTML = state.menus.map((m, i) => `
-        <div id="mc-${m.id}" class="premium-menu-card flex flex-col justify-between p-4 border-2 rounded-2xl cursor-pointer transition-all duration-200 select-none relative active:scale-95 min-h-[100px] ${i===0?'premium-selected':'premium-unselected'}" onclick="selectMenu('${m.id}')">
-            <input type="radio" name="menu-type" value="${m.name}" data-price="${m.price}" ${i===0?'checked':''} class="absolute top-3 right-3 accent-emerald-700 w-4 h-4">
-            <span class="font-black text-slate-800 text-sm pr-6 leading-snug block">${m.name}</span>
-            <span class="text-emerald-700 font-extrabold text-lg mt-2 block">${m.price} ฿</span>
+        <div id="mc-${m.id}" class="premium-menu-card flex items-center justify-between p-3.5 border-2 rounded-2xl cursor-pointer transition-all duration-200 select-none relative active:scale-[0.98] ${i===0?'premium-selected':'premium-unselected'}" onclick="selectMenu('${m.id}')">
+            <div class="flex items-center gap-3">
+                <input type="radio" name="menu-type" value="${m.name}" data-price="${m.price}" ${i===0?'checked':''} class="accent-emerald-700 w-4.5 h-4.5 pointer-events-none">
+                <span class="font-black text-slate-800 text-sm leading-snug">${m.name}</span>
+            </div>
+            <span class="text-emerald-700 font-black text-base">${m.price} ฿</span>
         </div>
     `).join('');
     updatePreview();
@@ -685,13 +784,15 @@ function updatePreview() {
     if (!menuRadio) return;
     const price = parseInt(menuRadio.dataset.price) || 0;
     const total = price * state.qty;
+    const nextQ = getNextQueueNo();
+    document.getElementById('preview-title').textContent = `พรีวิวคำสั่งซื้อ (คิวถัดไป: Q-${String(nextQ).padStart(3, '0')})`;
     document.getElementById('order-preview-text').textContent = `${noodle} · ${menuRadio.value} (${condiment})`;
     document.getElementById('order-preview-total').textContent = `${total.toLocaleString('th-TH')} ฿`;
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  ORDER PLACEMENT LOGIC
-// =====================================================================
+// ---------------------------------------------------------------------
 let _submitLock = false;
 
 async function handlePlaceOrder() {
@@ -702,7 +803,7 @@ async function handlePlaceOrder() {
     const btn     = document.getElementById('submit-btn');
     const btnText = document.getElementById('submit-btn-text');
     btn.disabled  = true;
-    btnText.textContent = 'กำลังออกคิวรับออเดอร์...';
+    btnText.textContent = 'กำลังออกคิวคลาวด์...';
 
     const noodle    = document.querySelector('input[name="noodle"]:checked')?.value;
     const menuRadio = document.querySelector('input[name="menu-type"]:checked');
@@ -730,16 +831,31 @@ async function handlePlaceOrder() {
         status: 'รอทำ', note, queueNo
     };
 
-    // บันทึกและซิงค์ทันที
+    // Save to Cloud Firestore
+    if (db && currentUser) {
+        try {
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderId), order);
+            toast(`ส่งข้อมูลคิวสำเร็จออกคิว Q-${String(queueNo).padStart(3, '0')}`, 'success');
+        } catch (err) {
+            console.error("Firestore order save error:", err);
+            toast("ส่งฐานข้อมูลคลาวด์ขัดข้อง บันทึกไว้ในเครื่องเรียบร้อย", "warn");
+            saveLocalBackup(order);
+        }
+    } else {
+        saveLocalBackup(order);
+        toast(`บันทึกแบบออฟไลน์เรียบร้อย คิว Q-${String(queueNo).padStart(3, '0')}`, 'success');
+    }
+
+    resetOrderForm();
+    resetSubmitBtn();
+}
+
+function saveLocalBackup(order) {
     state.orders.unshift(order);
-    state.knownOrderIds.add(orderId);
+    state.knownOrderIds.add(order.orderId);
     saveOrdersLocal();
     renderOrderList();
-    resetOrderForm();
-
-    toast(`บันทึกสำเร็จ ออกรหัสคิว Q-${String(queueNo).padStart(3, '0')}`, 'success');
-
-    resetSubmitBtn();
+    renderKitchenBoard();
 }
 
 function resetSubmitBtn() {
@@ -771,13 +887,12 @@ function resetOrderForm() {
     updatePreview();
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  ORDER LIST & RENDERING (ฝ่ายหน้าร้าน)
-// =====================================================================
+// ---------------------------------------------------------------------
 function filterTodayOrders(type) {
     state.todayFilter = type;
     
-    // สลับคลาสของแท็บตัวเลือกกรอง
     document.querySelectorAll('[id^="filter-today-"]').forEach(btn => {
         btn.classList.remove('bg-white', 'text-emerald-800', 'shadow-sm');
         btn.classList.add('text-slate-500', 'hover:text-slate-800');
@@ -795,10 +910,8 @@ function renderOrderList() {
     let todayOrds = state.orders.filter(o => o.date === dateStr);
     const container = document.getElementById('recent-orders-list');
 
-    // อัปเดตยอดนับรวม
     document.getElementById('today-order-count').textContent = todayOrds.length;
 
-    // กรองประเภทตามต้องการ
     if (state.todayFilter === 'wait') {
         todayOrds = todayOrds.filter(o => o.status === 'รอทำ');
     } else if (state.todayFilter === 'done') {
@@ -829,7 +942,7 @@ function renderOrderList() {
             <div class="space-y-1 flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap mb-1">
                     <span class="bg-amber-500 text-slate-900 font-black text-[10px] px-2 py-0.5 rounded-lg shadow-sm">คิว Q-${qText}</span>
-                    <span class="font-black text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">${o.orderId}</span>
+                    <span class="font-black text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[80px]">${o.orderId}</span>
                     <span class="text-[11px] text-slate-400 font-bold flex items-center gap-0.5">
                         <i data-lucide="clock" class="w-3 h-3"></i> ${o.time} น.
                     </span>
@@ -862,9 +975,9 @@ function updateKitchenBadge() {
     }
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  KITCHEN DASHBOARD RENDER & ACTIONS (ฝ่ายครัวหลังร้าน)
-// =====================================================================
+// ---------------------------------------------------------------------
 function renderKitchenBoard() {
     const dateStr = todayStr();
     const today   = state.orders.filter(o => o.date === dateStr);
@@ -886,7 +999,7 @@ function renderKitchenBoard() {
         : pending.map(o => kitchenCard(o, true)).join('');
 
     dList.innerHTML = done.length === 0
-        ? `<p class="text-center py-16 text-xs text-slate-400 col-span-full">ยังไม่มีรายการเสร็จสำหรับวันนี้</p>`
+        ? `<p class="text-center py-16 text-xs text-slate-400 col-span-full">ไม่มีประวัติคำสั่งซื้อเสร็จวันนี้</p>`
         : done.map(o => kitchenCard(o, false)).join('');
 
     lucide.createIcons();
@@ -901,7 +1014,7 @@ function kitchenCard(order, isPending) {
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <span class="bg-amber-500 text-slate-900 font-black text-xs px-2.5 py-0.5 rounded-lg shadow-sm">คิว Q-${qText}</span>
-                <span class="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">${order.orderId}</span>
+                <span class="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[80px]">${order.orderId}</span>
             </div>
             <span class="text-[11px] font-bold text-slate-500 flex items-center gap-0.5">
                 <i data-lucide="clock" class="w-3.5 h-3.5"></i> ${order.time} น.
@@ -931,17 +1044,33 @@ async function completeOrder(orderId) {
     const idx = state.orders.findIndex(o => o.orderId === orderId);
     if (idx === -1) return;
 
-    // เปลี่ยนแปลงแบบโลคัลและเซฟ
-    state.orders[idx].status = 'เสร็จแล้ว';
-    saveOrdersLocal();
-    renderKitchenBoard();
-    renderOrderList();
-    toast(`คิวผัดไทย Q-${String(state.orders[idx].queueNo).padStart(3, '0')} ปรุงเสร็จเรียบร้อย!`, 'success');
+    if (db && currentUser) {
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderId), { status: 'เสร็จแล้ว' });
+            toast(`คิว Q-${String(state.orders[idx].queueNo).padStart(3, '0')} ปรุงเสร็จแล้ว!`, 'success');
+        } catch (err) {
+            console.error("Firestore complete order error:", err);
+            toast("ส่งฐานข้อมูลคลาวด์ขัดข้อง ปรับระดับแบบท้องถิ่นแทน", "warn");
+            localCompleteOrder(orderId);
+        }
+    } else {
+        localCompleteOrder(orderId);
+    }
 }
 
-// =====================================================================
-//  AUDIO FEEDBACK NOTIFIER (ระบบแจ้งเตือนเสียงออเดอร์ใหม่)
-// =====================================================================
+function localCompleteOrder(orderId) {
+    const idx = state.orders.findIndex(o => o.orderId === orderId);
+    if (idx !== -1) {
+        state.orders[idx].status = 'เสร็จแล้ว';
+        saveOrdersLocal();
+        renderKitchenBoard();
+        renderOrderList();
+    }
+}
+
+// ---------------------------------------------------------------------
+//  AUDIO FEEDBACK NOTIFIER (ระบบแจ้งเตือนเสียงเวลามีออเดอร์ใหม่)
+// ---------------------------------------------------------------------
 function playNotificationSound() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -959,9 +1088,9 @@ function playNotificationSound() {
     } catch(e) {}
 }
 
-// =====================================================================
-//  DASHBOARD ANALYTICS (ฝ่ายวิเคราะห์ยอดขาย)
-// =====================================================================
+// ---------------------------------------------------------------------
+//  DASHBOARD ANALYTICS (ฝ่ายวิเคราะห์วิจัยความสำเร็จร้าน)
+// ---------------------------------------------------------------------
 function loadDashboard() {
     const date   = document.getElementById('dashboard-date').value || todayStr();
     const ords   = state.orders.filter(o => o.date === date);
@@ -1003,7 +1132,6 @@ function renderSalesChart(stats) {
     const labels = Object.keys(stats);
     const data   = Object.values(stats);
     
-    // Modern colors palette
     const colors = [
         '#064e3b', '#15803d', '#10b981', '#34d399', 
         '#f59e0b', '#fbbf24', '#3b82f6', '#6366f1', 
@@ -1040,9 +1168,9 @@ function renderSalesChart(stats) {
     });
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  MENU CRUD PANEL LOGIC
-// =====================================================================
+// ---------------------------------------------------------------------
 function renderMenuCards() {
     const c = document.getElementById('menu-card-container');
     if (state.menus.length === 0) {
@@ -1089,16 +1217,38 @@ async function saveMenuFromModal() {
     if (!name || isNaN(price) || price < 0) { toast('กรุณาระบุข้อมูลเมนูและราคาให้ถูกต้อง', 'error'); return; }
 
     if (state.editingMenuId) {
-        const i = state.menus.findIndex(m => m.id === state.editingMenuId);
-        if (i !== -1) { state.menus[i].name = name; state.menus[i].price = price; }
+        // Update menu
+        if (db && currentUser) {
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'menus', state.editingMenuId), { id: state.editingMenuId, name, price });
+            } catch (err) {
+                console.error("Firestore menu update error:", err);
+            }
+        } else {
+            const i = state.menus.findIndex(m => m.id === state.editingMenuId);
+            if (i !== -1) { state.menus[i].name = name; state.menus[i].price = price; }
+            saveMenusLocal();
+            renderMenuOptions();
+            renderMenuCards();
+        }
     } else {
-        const newMenu = { id: 'm_' + Date.now(), name, price };
-        state.menus.push(newMenu);
+        // Add new menu
+        const newId = 'm_' + Date.now();
+        const newMenu = { id: newId, name, price };
+        if (db && currentUser) {
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'menus', newId), newMenu);
+            } catch (err) {
+                console.error("Firestore menu add error:", err);
+            }
+        } else {
+            state.menus.push(newMenu);
+            saveMenusLocal();
+            renderMenuOptions();
+            renderMenuCards();
+        }
     }
 
-    saveMenusLocal();
-    renderMenuOptions();
-    renderMenuCards();
     closeMenuModal();
     toast('บันทึกรายละเอียดราคาของเมนูแล้ว', 'success');
 }
@@ -1107,42 +1257,79 @@ async function deleteMenu(menuId) {
     if (state.menus.length <= 1) { toast('ระบบต้องมีผัดไทยอย่างน้อย 1 รายการเพื่อขาย', 'error'); return; }
     const ok = await showConfirm('ยืนยันความต้องการจะลบเมนูผัดไทยรายการนี้หรือไม่?');
     if (!ok) return;
-    state.menus = state.menus.filter(m => m.id !== menuId);
-    saveMenusLocal();
-    renderMenuOptions();
-    renderMenuCards();
-    toast('ลบเมนูผัดไทยออกจากแคตตาล็อกแล้ว', 'info');
+
+    if (db && currentUser) {
+        try {
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'menus', menuId));
+            toast('ลบเมนูสำเร็จ', 'info');
+        } catch (err) {
+            console.error("Firestore menu delete error:", err);
+        }
+    } else {
+        state.menus = state.menus.filter(m => m.id !== menuId);
+        saveMenusLocal();
+        renderMenuOptions();
+        renderMenuCards();
+        toast('ลบเมนูผัดไทยออกจากแคตตาล็อกแล้ว', 'info');
+    }
 }
 
 async function confirmResetData() {
-    const ok = await showConfirm('คุณกำลังล้างข้อมูลในระบบนี้ทั้งหมดเพื่อตั้งค่าโรงงาน ประวัติคำสั่งซื้อทั้งหมดในเครื่องจะสูญหายอย่างถาวร ยืนยันหรือไม่?');
+    const ok = await showConfirm('คุณกำลังล้างข้อมูลสั่งซื้อทั้งหมดออกจากระบบคลาวด์ ประวัติการสั่งซื้อทุกอุปกรณ์ที่กำลังซิงค์จะสูญหายถาวร ยืนยันหรือไม่?');
     if (!ok) return;
-    state.orders = [];
-    state.knownOrderIds.clear();
-    localStorage.removeItem('pum_orders');
-    renderOrderList();
-    toast('ล้างระบบฐานข้อมูลทั้งหมดสำเร็จแล้ว', 'info');
+
+    if (db && currentUser) {
+        try {
+            // Delete all cloud orders inside shared collection
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'orders');
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(async (document) => {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', document.id));
+            });
+            toast('ล้างระบบฐานข้อมูลทั้งหมดสำเร็จแล้ว', 'info');
+        } catch (err) {
+            console.error("Cloud reset failed:", err);
+            toast("ไม่สามารถลบข้อมูลคลาวด์ได้ในขณะนี้", "error");
+        }
+    } else {
+        state.orders = [];
+        state.knownOrderIds.clear();
+        localStorage.removeItem('pum_orders');
+        renderOrderList();
+        renderKitchenBoard();
+        toast('ล้างประวัติออฟไลน์ในเครื่องเรียบร้อย', 'info');
+    }
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  CSV EXPORT ENGINE
-// =====================================================================
+// ---------------------------------------------------------------------
 function exportCSV() {
     if (state.orders.length === 0) { toast('ไม่พบออเดอร์ในประวัติสำหรับการแปลงไฟล์รายงาน', 'warn'); return; }
     let csv = '\uFEFFDate,Time,OrderID,QueueNo,Menu,Qty,Price,Total,Status,Note\n';
     state.orders.forEach(o => {
         csv += [o.date, o.time, o.orderId, o.queueNo || '-', `"${o.menu}"`, o.qty, o.price, o.total, `"${o.status}"`, `"${(o.note||'').replace(/"/g,'""')}"`].join(',') + '\n';
     });
+    
+    // Copy fallback for standard safety
+    const textToCopy = csv;
+    const dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = textToCopy;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
     a.download = `รายงานผัดไทยคุณปุ้ม_${todayStr()}.csv`;
     a.click();
-    toast('ดาวน์โหลดรายงานขายรูปแบบ CSV สำเร็จแล้ว', 'success');
+    toast('ดาวน์โหลดรายงาน CSV สำเร็จแล้ว (คัดลอกลงคลิปบอร์ดให้เช่นกัน)', 'success');
 }
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  CONFIRMED WINDOW PROMPT DIALOG
-// =====================================================================
+// ---------------------------------------------------------------------
 function showConfirm(msg) {
     return new Promise(resolve => {
         state.confirmResolve = resolve;
@@ -1160,14 +1347,13 @@ document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
     state.confirmResolve?.(false);
 });
 
-// ซ่อนโมดอลหากคลิกข้างหลังกล่องข้อความ
 document.getElementById('menu-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeMenuModal();
 });
 
-// =====================================================================
+// ---------------------------------------------------------------------
 //  MODERN TOAST ALERTER
-// =====================================================================
+// ---------------------------------------------------------------------
 function toast(msg, type = 'info') {
     const colors = {
         success: 'bg-emerald-800 border-emerald-700 shadow-emerald-900/10',
@@ -1184,44 +1370,66 @@ function toast(msg, type = 'info') {
     container.appendChild(el);
     lucide.createIcons();
     
-    // เอฟเฟกต์เลื่อนขึ้น
     setTimeout(() => {
         el.classList.remove('translate-y-2', 'opacity-0');
     }, 10);
 
-    // หายไปใน 3.5 วินาที
     setTimeout(() => { 
         el.classList.add('opacity-0', 'translate-y-1'); 
         setTimeout(() => el.remove(), 400); 
     }, 3500);
 }
 
-// ทำความสะอาดไอคอนครั้งสุดท้ายหลังโหลดทั้งหมดเสร็จสิ้น
-setTimeout(() => lucide.createIcons(), 500);
+// ---------------------------------------------------------------------
+//  INITIALIZE APP
+// ---------------------------------------------------------------------
+window.addEventListener('DOMContentLoaded', () => {
+    // กำหนดค่าเริ่มต้นของวันที่วิเคราะห์ยอดขาย (วันนี้)
+    document.getElementById('dashboard-date').value = todayStr();
 
-// Service Worker Registration for Offline support (PWA)
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+    buildNoodleUI();
+    buildCondimentUI();
+    renderMenuOptions();
+    renderMenuCards();
+    renderOrderList();
 
-// Install button setup
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  const btn = document.getElementById("installBtn");
-  if (btn) {
-    btn.style.display = "block";
-
-    btn.onclick = () => {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        deferredPrompt = null;
-      });
-    };
-  }
+    // เริ่มทำงานระบบ Authentication และคลาวด์อ้างอิง
+    authenticate();
+    
+    // ตรวจจับ Local Storage Sync สำหรับแท็บที่เปิดเครื่องเดียวกันเพิ่มเติม
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'pum_orders' && !db) { // ทำเฉพาะเมื่อไม่มี DB คลาวด์ทำงาน
+            state.orders = JSON.parse(e.newValue || '[]');
+            renderOrderList();
+            renderKitchenBoard();
+        }
+        if (e.key === 'pum_menus' && !db) {
+            state.menus = JSON.parse(e.newValue || '[]');
+            renderMenuOptions();
+            renderMenuCards();
+        }
+    });
 });
+
+// ส่งออกฟังก์ชันภายนอกให้สามารถเรียกใช้งานในอินไลน์ HTML ได้
+window.switchTab = switchTab;
+window.adjustQty = adjustQty;
+window.handlePlaceOrder = handlePlaceOrder;
+window.filterTodayOrders = filterTodayOrders;
+window.completeOrder = completeOrder;
+window.exportCSV = exportCSV;
+window.openMenuModal = openMenuModal;
+window.closeMenuModal = closeMenuModal;
+window.saveMenuFromModal = saveMenuFromModal;
+window.deleteMenu = deleteMenu;
+window.confirmResetData = confirmResetData;
+window.resetOrderForm = resetOrderForm;
+window.selectMenu = selectMenu;
+
+// Service Worker for Progressive Web App
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js").catch(()=>{});
+}
 </script>
 </body>
 </html>
